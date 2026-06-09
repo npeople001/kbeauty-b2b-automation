@@ -1,0 +1,31 @@
+﻿message_id,buyer_id,company_name,country,language,priority_tier,approval_block,message_status,message_type,subject_or_opening,message_body,recommended_brands,excluded_brands,compliance_notes,required_internal_review,next_action,generated_at
+MSG-0001,BUYER-0001,Shanghai Sample Beauty Trade,China,Chinese,A,false,draft_ready_for_internal_review,quotation_intro,内部审核草稿：K-beauty供货报价准备,"내부 검토용 초안입니다. 외부로 발송되지 않았으며, 발송 전 내부 검토가 필요합니다.
+以下内容为内部审核草稿，不是已发送的信息。
+您好，Shanghai Sample Beauty Trade。我们可在内部确认后，就K-beauty批发/出口合作进行谨慎沟通。
+可内部审核的品牌候选：아누아; 토리든
+一般业务条件可按MOQ 100+件、交期约20-30天作为初步讨论基础，但最终条件需确认产品、数量、库存和供应情况后再定。
+如需下一步沟通，请先内部确认品牌权限、数量、付款风险、翻译和合规表达。",아누아; 토리든,,내부 검토용 초안; 외부 발송 전 검토 필요; 가격/재고/유통기한 확인 필요; 화장품 표현 검토 필요; 자동 발송 없음; 현지화/번역 검토 필요; 결제 리스크 검토 필요; 바이어 실제성은 이 자동화에서 검증하지 않음; 수동 제공 데이터 기반,true,승인 가능 브랜드 기준으로 제안서 또는 견적 검토를 준비합니다.,2026-06-08
+MSG-0002,BUYER-0002,Bangkok Sample Online Seller,Thailand,English,Hold,false,needs_moq_confirmation,low_priority_nurture,Internal review draft: cautious K-beauty follow-up,"내부 검토용 초안입니다. 외부로 발송되지 않았으며, 발송 전 내부 검토가 필요합니다.
+This is an internal-review draft only and has not been sent externally.
+Hello Bangkok Sample Online Seller, this draft may be used internally to review a cautious K-beauty wholesale/export discussion.
+Brand candidates for internal review: 조선미녀; 스킨1004
+General business discussion may start from MOQ 100+ units and an estimated 20-30 day delivery lead time, but final terms require confirmation of product, quantity, availability, and supply conditions.
+Before any external use, review brand approval, quantity fit, payment risk, cosmetics wording, and localization.",조선미녀; 스킨1004,,내부 검토용 초안; 외부 발송 전 검토 필요; 가격/재고/유통기한 확인 필요; 화장품 표현 검토 필요; 자동 발송 없음; 현지화/번역 검토 필요; MOQ 확인 필요; 결제 리스크 검토 필요; 바이어 실제성은 이 자동화에서 검증하지 않음; 수동 제공 데이터 기반,true,외부 제안 전 예상 주문 수량과 MOQ 100+ 충족 가능성을 내부에서 먼저 확인합니다.,2026-06-08
+MSG-0003,BUYER-0003,Moscow Sample Import Group,Russia,English,B,false,needs_moq_confirmation,low_priority_nurture,Internal review draft: cautious K-beauty follow-up,"내부 검토용 초안입니다. 외부로 발송되지 않았으며, 발송 전 내부 검토가 필요합니다.
+This is an internal-review draft only and has not been sent externally.
+Hello Moscow Sample Import Group, this draft may be used internally to review a cautious K-beauty wholesale/export discussion.
+Brand candidates for internal review: 리쥬란; 아비브
+General business discussion may start from MOQ 100+ units and an estimated 20-30 day delivery lead time, but final terms require confirmation of product, quantity, availability, and supply conditions.
+Before any external use, review brand approval, quantity fit, payment risk, cosmetics wording, and localization.",리쥬란; 아비브,,내부 검토용 초안; 외부 발송 전 검토 필요; 가격/재고/유통기한 확인 필요; 화장품 표현 검토 필요; 자동 발송 없음; 현지화/번역 검토 필요; MOQ 확인 필요; 바이어 실제성은 이 자동화에서 검증하지 않음; 수동 제공 데이터 기반,true,외부 제안 전 예상 주문 수량과 MOQ 100+ 충족 가능성을 내부에서 먼저 확인합니다.,2026-06-08
+MSG-0004,BUYER-0004,Guangzhou Placeholder Commerce,China,Chinese,Hold,true,blocked_approval_required,approval_review_required,Internal approval review required before proposal,"내부 검토용 초안입니다. 외부로 발송되지 않았으며, 발송 전 내부 검토가 필요합니다.
+内部审核提示：该品牌需先完成内部批准，批准前不得对外提案或报价。
+내부 승인 검토 필요: Guangzhou Placeholder Commerce의 관심 브랜드 중 메디큐브가 승인 필요 또는 제안 제한 대상으로 확인되었습니다.
+승인 전에는 해당 브랜드의 외부 제안, buyer-facing pitch, 견적, 공개 콘텐츠, 광고 문구를 진행하지 마십시오.
+다음 단계는 승인 가능 여부를 내부에서 확인하고, 필요 시 승인 가능한 브랜드 또는 제품군 중심의 대안을 별도로 검토하는 것입니다.
+이 문구는 내부 지침이며 구매자에게 보낼 제안문이 아닙니다.",,메디큐브,내부 검토용 초안; 외부 발송 전 검토 필요; 가격/재고/유통기한 확인 필요; 화장품 표현 검토 필요; 자동 발송 없음; 브랜드 승인 확인 필요; 현지화/번역 검토 필요; 결제 리스크 검토 필요; 바이어 실제성은 이 자동화에서 검증하지 않음; 수동 제공 데이터 기반; 안전한 추천 브랜드 없음 또는 제품군 중심 논의 필요,true,"내부 승인 검토를 먼저 진행하고, 승인 전에는 외부 제안/피치/견적/공개 콘텐츠/광고 문구를 진행하지 않습니다.",2026-06-08
+MSG-0005,BUYER-0005,Ho Chi Minh Sample Retail Chain,Vietnam,English,A,false,draft_ready_for_internal_review,follow_up,Internal review draft: K-beauty category follow-up,"내부 검토용 초안입니다. 외부로 발송되지 않았으며, 발송 전 내부 검토가 필요합니다.
+This is an internal-review draft only and has not been sent externally.
+Hello Ho Chi Minh Sample Retail Chain, this draft may be used internally to review a cautious K-beauty wholesale/export discussion.
+Brand candidates for internal review: 라운드랩; 클라뷰
+General business discussion may start from MOQ 100+ units and an estimated 20-30 day delivery lead time, but final terms require confirmation of product, quantity, availability, and supply conditions.
+Before any external use, review brand approval, quantity fit, payment risk, cosmetics wording, and localization.",라운드랩; 클라뷰,,내부 검토용 초안; 외부 발송 전 검토 필요; 가격/재고/유통기한 확인 필요; 화장품 표현 검토 필요; 자동 발송 없음; 현지화/번역 검토 필요; 바이어 실제성은 이 자동화에서 검증하지 않음; 수동 제공 데이터 기반,true,승인 가능 브랜드 기준으로 제안서 또는 견적 검토를 준비합니다.,2026-06-08

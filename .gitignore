@@ -1,0 +1,23 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Virtual environments and local secrets
+.venv/
+venv/
+.env
+
+# Temporary and log files
+*.tmp
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Excel temporary files
+~$*.xlsx
+
+# Generated output files
+output/*
+!output/.gitkeep
