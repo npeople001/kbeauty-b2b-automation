@@ -172,6 +172,161 @@ Price, stock, expiry, MOQ, delivery, tax, shipping, duties, payment terms, and i
 
 Approval-required brands such as `메디큐브` must not be externally proposed, quoted, or used in public content without explicit approval.
 
+## Integrated Runner
+
+The Integrated Runner orchestrates the existing local Task 006-010 scripts for the internal sample buyer sales workflow. It does not replace existing validators, business rules, approval rules, quotation rules, or privacy rules.
+
+The runner is internal-review only. It does not send, scrape, collect, enrich, verify, or externally communicate. It does not implement email sending, messaging automation, quotation sending, scraping, live web research, automatic search, APIs, browser automation, crawlers, buyer enrichment, credit checks, external data collection, or external sending.
+
+### Supported Workflow
+
+Supported workflow:
+
+- `buyer_sales_sample`
+
+This workflow uses sample/internal-review data only. It does not use `data/private/`, `output/private/`, or `output/final/` paths. It does not create external-ready outputs. Its purpose is to reduce manual command execution errors while preserving the existing Task 006-010 logic.
+
+### Dry Run
+
+Run dry-run before running the full sample workflow:
+
+```powershell
+python automations/run_internal_workflow.py --workflow buyer_sales_sample --dry-run
+```
+
+Dry-run prints the planned stages and commands. It does not execute generation scripts, does not create or modify output files, and should not create `output/internal_workflow_summary.md`.
+
+### Full Sample Workflow
+
+Run the full sample workflow:
+
+```powershell
+python automations/run_internal_workflow.py --workflow buyer_sales_sample --output-summary output/internal_workflow_summary.md
+```
+
+The full workflow runs Privacy Guard first, then buyer lead validation, buyer scoring generation, buyer score validation, proposal message generation, proposal message validation, quotation generation, quotation validation, and finally writes `output/internal_workflow_summary.md`.
+
+### Validation Commands
+
+Validate the runner and generated summary:
+
+```powershell
+python tests/validate_integrated_runner.py --check-summary --summary output/internal_workflow_summary.md
+```
+
+Also run:
+
+```powershell
+python tests/validate_privacy_guard.py
+python -m py_compile automations/run_internal_workflow.py tests/validate_integrated_runner.py
+```
+
+### Execution Stages
+
+The workflow stages run in this order:
+
+1. `privacy_guard_validation`
+2. `buyer_lead_validation`
+3. `buyer_scoring_generation`
+4. `buyer_score_validation`
+5. `proposal_message_generation`
+6. `proposal_message_validation`
+7. `quotation_generation`
+8. `quotation_validation`
+9. `final_run_summary`
+
+### Summary Interpretation
+
+The summary result should be interpreted as:
+
+- `PASS`: all stages completed and validations passed.
+- `WARNING`: a non-blocking issue requires review.
+- `FAIL`: the workflow stopped or validation failed.
+
+`output/internal_workflow_summary.md` includes the workflow name, overall result, `started_at`, `finished_at`, stage commands, stage results, output paths, internal-review only disclaimer, no external sending disclaimer, and next action.
+
+### Failure Handling
+
+Privacy Guard failure stops the workflow. Buyer lead validation failure, generation failure, and output validation failure also stop the workflow.
+
+The failed stage, command, return code, stdout/stderr summary, and next action are recorded. The operator should fix the failed stage and rerun from the beginning unless a later task defines partial rerun support.
+
+### Input and Output Files
+
+Source input files:
+
+- `data/buyers_raw_sample.csv`
+- `data/buyers_master_sample.csv`
+- `data/brands_master.csv`
+- `data/quotation_inputs_sample.csv`
+
+Generated/intermediate files:
+
+- `data/buyers_scored_sample.csv`
+- `data/proposal_messages_sample.csv`
+- `data/quotation_sample.csv`
+
+Output files:
+
+- `output/proposal_messages_sample.md`
+- `output/quotation_sample.md`
+- `output/quotation_sample.xlsx`
+- `output/internal_workflow_summary.md`
+
+The runner does not directly edit source input CSV files. Existing generation scripts may update their own generated sample outputs.
+
+### Privacy and Real Data Restrictions
+
+Privacy Guard runs first. `buyer_sales_sample` does not use real/private data. Real data workflows are not supported yet.
+
+Do not pass `data/private/`, `output/private/`, or `output/final/` paths. Real data support requires separate design and approval. Run Privacy Guard before commit and before any real data migration.
+
+### External Automation Restrictions
+
+The Integrated Runner does not implement:
+
+- Scraping.
+- Live web research.
+- Automatic search.
+- APIs.
+- Browser automation.
+- Crawlers.
+- Buyer enrichment.
+- Credit checks.
+- Email sending.
+- Messaging automation.
+- Quotation sending.
+- External sending.
+
+### Operator Checklist
+
+Before running:
+
+- Privacy Guard passes.
+- Source sample CSV files exist.
+- Output files can be regenerated.
+- `output/quotation_sample.xlsx` is closed.
+- No real/private data is staged.
+- The operator understands outputs are internal-review only.
+
+After running:
+
+- Check overall `PASS`, `WARNING`, or `FAIL`.
+- Review `output/internal_workflow_summary.md`.
+- Review proposal and quotation outputs manually.
+- Run Privacy Guard before commit.
+- Do not externally send generated outputs without separate manual review.
+
+### Known Limitations
+
+- Sample workflow only.
+- No real/private workflow support.
+- No partial rerun support unless implemented later.
+- No external sending.
+- No commercial accuracy validation beyond existing validators.
+- No buyer authenticity or credit verification.
+- No dashboard.
+
 ### Commit Safety Workflow
 
 1. Update sample/source files only.

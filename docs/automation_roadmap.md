@@ -194,4 +194,34 @@ This roadmap defines planned automation tasks for the K-beauty B2B export busine
 - Real data creation restriction: Task 010 does not create real data files or private folders.
 - Validation method: Run `python tests/validate_privacy_guard.py`; confirm `.gitignore` protects private folders and sensitive filename patterns; confirm sample/source files remain trackable; confirm no real data files, private folders, scraping/live research/API/external data collection, or external sending automation were added.
 - Risks: Privacy Guard is not a full DLP system. Human review is still required before commit. Real data may still be accidentally placed in the wrong path if operating discipline is weak. Commercial data freshness must still be verified manually. Approval-required brand misuse remains a business risk.
-- Future work: Task 011 remains future discussion only and is not defined or started here.
+- Follow-up: Task 011 was later defined as Integrated Runner to orchestrate the existing sample buyer sales workflow after Task 010 privacy guardrails were in place.
+
+## Task 011: Integrated Runner
+
+- Status: Completed pending final review.
+- Goal: Run the existing internal Task 006-010 buyer sales sample workflow through one controlled local runner while preserving all privacy, approval, validation, quotation, and internal-review restrictions.
+- Input: Existing local sample files and generated sample dependencies for `buyer_sales_sample`, including `data/buyers_raw_sample.csv`, `data/buyers_master_sample.csv`, `data/brands_master.csv`, `data/quotation_inputs_sample.csv`, generated sample outputs, and existing generator/validator scripts.
+- Completed outputs:
+  - `docs/integrated_runner_spec.md`
+  - `docs/integrated_runner_workflow.md`
+  - `automations/run_internal_workflow.py`
+  - `tests/validate_integrated_runner.py`
+  - `output/internal_workflow_summary.md`
+  - `README.md`
+- Supported workflow: `buyer_sales_sample`.
+- Execution stages:
+  - Privacy Guard validation
+  - buyer lead validation
+  - buyer scoring generation
+  - buyer score validation
+  - proposal message generation
+  - proposal message validation
+  - quotation generation
+  - quotation validation
+  - final run summary
+- Output: Controlled workflow run summary at `output/internal_workflow_summary.md`, plus generated sample outputs refreshed by existing generators where applicable.
+- Business rules: Integrated Runner orchestrates existing local scripts only and does not replace existing generators or validators. Privacy Guard runs first, and Privacy Guard failure blocks downstream generation. The full workflow remains internal-review only. The runner uses sample/internal-review data only, does not use `data/private/` or `output/private/` paths, does not create real data files, and does not directly modify source input CSV files. Generated sample outputs may be refreshed by existing generators.
+- External data and sending restriction: Task 011 does not include a real data workflow, `data/private/` usage, dashboard, scraping, live web research, automatic search, APIs, browser automation, crawlers, buyer enrichment, credit checks, email sending, messaging automation, quotation sending, external sending, or external data collection.
+- Validation method: Run `python tests/validate_privacy_guard.py`; run `python tests/validate_integrated_runner.py`; run `python automations/run_internal_workflow.py --workflow buyer_sales_sample --dry-run`; run `python automations/run_internal_workflow.py --workflow buyer_sales_sample --output-summary output/internal_workflow_summary.md`; run `python tests/validate_integrated_runner.py --check-summary --summary output/internal_workflow_summary.md`; run `python -m py_compile automations/run_internal_workflow.py tests/validate_integrated_runner.py`.
+- Risks: Runner executes multiple scripts, so failure cause must be read from the summary. Generated sample output files may change during full run. XLSX output can be affected by file locks. Summary `PASS` does not mean external-ready proposal or quotation. Real/private workflow is not supported yet. Human review is still required before external use. Future dashboard or real-data runner requires separate design.
+- Future work: Task 012 remains future discussion only. Do not define or start Task 012 until Task 011 final review passes.
