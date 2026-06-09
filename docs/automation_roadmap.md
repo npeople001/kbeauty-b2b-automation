@@ -174,4 +174,24 @@ This roadmap defines planned automation tasks for the K-beauty B2B export busine
 - Validation method: Run `python automations/quotation_maker/generate_quotations.py`; run `python tests/validate_quotations.py --quote-inputs data/quotation_inputs_sample.csv --quotations data/quotation_sample.csv --markdown output/quotation_sample.md --xlsx output/quotation_sample.xlsx --buyers data/buyers_master_sample.csv --scores data/buyers_scored_sample.csv --proposals data/proposal_messages_sample.csv --brands data/brands_master.csv`; verify exact output columns, row count, UTF-8 BOM CSV encoding, Markdown UTF-8 readability, XLSX sheets, approval block handling, `메디큐브` blocking, price/stock/expiry/MOQ status handling, total amount calculation, privacy-sensitive contact exclusion, forbidden claim/commercial term prevention, Korean/English/Chinese preservation, and no external sending or external data collection scope.
 - Risks: Manual price data may be outdated. Stock and available quantity may change. Expiry date must be rechecked before quoting. MOQ and delivery lead time may vary by product and supplier. Tax, shipping, duties, customs fees, insurance, discounts, payment terms, and incoterms are not included unless manually verified. Approval-required brands remain business-critical risk. Actual external quotation requires human review and approval.
 - Foundation note: Task 001-009 now complete the first-pass internal automation foundation for brand master, market research/content planning, buyer lead management, buyer scoring, proposal drafts, and internal quotation drafts.
-- Future work: Any additional task after Task 009 should be discussed separately; Task 010 is not started or defined here.
+- Follow-up: Task 010 was later defined as Real Data Migration & Privacy Guard to prepare the repository for real operating data protection before real business use.
+
+## Task 010: Real Data Migration & Privacy Guard
+
+- Status: Completed pending final review.
+- Goal: Separate sample data from future real operating data, protect sensitive buyer/contact/price/stock/expiry/quotation/private business data, and define Privacy Guard validation before real business use.
+- Input: Existing Task 001-009 repository structure, sample data files, output handling rules, `.gitignore`, README operating guidance, and privacy guard policy documents.
+- Completed outputs:
+  - `docs/real_data_migration_privacy_guard_spec.md`
+  - `docs/real_sample_data_policy.md`
+  - `docs/privacy_guard_validation_workflow.md`
+  - `.gitignore`
+  - `README.md`
+  - `tests/validate_privacy_guard.py`
+- Output: Real/sample data policy, private-data ignore protections, Privacy Guard validation workflow, README operating guidance, and local privacy guard validator.
+- Business rules: Task 010 protects real operating data before real business use. Real buyer/contact/price/stock/expiry/quotation data must not be committed to Git. `data/private/**`, `output/private/**`, `output/final/**`, and `local_config/**` are protected by `.gitignore`. Sensitive filename patterns such as `*_real.csv`, `*_private.csv`, `*_contacts.csv`, `*_prices.csv`, `*_stock.csv`, `*_expiry.csv`, and `*_quotation_final.*` are protected. Sample data must remain fictional and placeholder-based. `메디큐브` remains approval-required unless explicit approval is recorded. Task 001-009 outputs remain internal-review only.
+- External data and sending restriction: Task 010 does not include scraping, live web research, automatic search, APIs, browser automation, crawlers, buyer enrichment, credit checks, external data collection, email sending, messaging automation, quotation sending, or external sending.
+- Real data creation restriction: Task 010 does not create real data files or private folders.
+- Validation method: Run `python tests/validate_privacy_guard.py`; confirm `.gitignore` protects private folders and sensitive filename patterns; confirm sample/source files remain trackable; confirm no real data files, private folders, scraping/live research/API/external data collection, or external sending automation were added.
+- Risks: Privacy Guard is not a full DLP system. Human review is still required before commit. Real data may still be accidentally placed in the wrong path if operating discipline is weak. Commercial data freshness must still be verified manually. Approval-required brand misuse remains a business risk.
+- Future work: Task 011 remains future discussion only and is not defined or started here.

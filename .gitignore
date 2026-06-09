@@ -18,6 +18,44 @@ Thumbs.db
 # Excel temporary files
 ~$*.xlsx
 
+# Real operating data / private business data
+data/private/**
+output/private/**
+output/final/**
+local_config/**
+
+# Real/private CSV patterns
+*_real.csv
+*_private.csv
+*_production.csv
+*_contacts.csv
+*_buyers_real.csv
+*_prices.csv
+*_price_list.csv
+*_stock.csv
+*_inventory.csv
+*_expiry.csv
+*_quotation_final.*
+*_supplier_terms.*
+*_contract_terms.*
+*_payment_terms.*
+*_incoterms.*
+
+# Sensitive config/credential patterns
+.env
+*.key
+*_token*
+*_credentials*
+credentials.*
+secrets.*
+local_settings.*
+local_config.*
+
+# Generated real/private output patterns
+*_final_quotation.*
+*_external_ready.*
+*_send_ready.*
+
 # Generated output files
 output/*
 !output/.gitkeep

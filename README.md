@@ -69,3 +69,125 @@ The script reads `data/brands_master.csv` and creates `output/brands_master.xlsx
 - Approval-required brands can only be included in external proposal outputs after explicit approval.
 - Unknown official English brand names should not be guessed.
 - Priority values should use `high`, `medium`, `low`, or `unknown`.
+
+## Real Data & Privacy Guard
+
+Tasks 001-009 are the first-pass internal automation foundation for brand master, market/content planning, buyer lead templates, buyer scoring, internal-review proposal drafts, and internal-review quotation drafts.
+
+The current sample files are safe, fictitious test data. Real buyer, contact, price, stock, expiry, supplier, quotation, and approval-sensitive data must not be committed to Git. Task 010 adds policy and guardrails for real operation, but the system remains internal-review only.
+
+### Before Using Real Data
+
+- Confirm repository privacy and access control.
+- Confirm `.gitignore` protects private folders and sensitive filename patterns.
+- Do not place real data in tracked sample files.
+- Use ignored/private paths for real operating data only after policy is applied.
+- Do not commit buyer contact data.
+- Do not commit real price, stock, expiry, or supplier terms.
+- Do not commit final quotations or external-ready documents.
+- Run Privacy Guard validation before commit.
+- Manually review `git status` before commit.
+- Keep external communication manual and separately approved.
+
+### Privacy Guard Command
+
+Run the Privacy Guard before committing or before introducing real operating data:
+
+```powershell
+python tests/validate_privacy_guard.py
+```
+
+Optional modes:
+
+```powershell
+python tests/validate_privacy_guard.py --root .
+python tests/validate_privacy_guard.py --mode working-tree
+python tests/validate_privacy_guard.py --staged-only
+```
+
+The validation checks:
+
+- Sensitive file names and paths.
+- Real/private/contact/price/stock/expiry/final quotation patterns.
+- Sample contact placeholder safety.
+- `메디큐브` approval-required context.
+- Forbidden external collection or sending implementation.
+- Required `.gitignore` protections.
+- Sample files remain trackable.
+
+### Safe Sample Data Rules
+
+- Sample data must be fictional.
+- Sample emails should use `example.invalid`.
+- Sample phone numbers must be placeholders.
+- Sample WeChat and WhatsApp values must be placeholders.
+- Sample price, stock, and expiry values must be marked as fictional/manual sample values.
+- Sample proposal and quotation outputs must remain internal-review drafts.
+
+### Real Data Rules
+
+The following must not be committed:
+
+- Real buyer contact details.
+- `contact_email`
+- `contact_phone`
+- `wechat_id`
+- `whatsapp`
+- Real buyer notes with private business context.
+- Real supplier price lists.
+- Real stock lists.
+- Real expiry lists.
+- Real supply availability.
+- Real quotation inputs.
+- Real quotation outputs.
+- Final quotations.
+- Supplier payment terms.
+- Private contract terms.
+- Incoterms.
+- Confidential brand approval records.
+- Credentials, tokens, or local config.
+
+### External Automation Restrictions
+
+This repository does not currently implement:
+
+- Scraping.
+- Live web research.
+- Automatic search.
+- APIs.
+- Browser automation.
+- Crawlers.
+- Buyer enrichment.
+- Credit checks.
+- Email sending.
+- Messaging automation.
+- Quotation sending.
+- External sending.
+
+### Operating Principle
+
+Internal-review outputs are not final external documents. Proposal drafts and quotation drafts require human review before external use.
+
+Price, stock, expiry, MOQ, delivery, tax, shipping, duties, payment terms, and incoterms must be manually verified.
+
+Approval-required brands such as `메디큐브` must not be externally proposed, quoted, or used in public content without explicit approval.
+
+### Commit Safety Workflow
+
+1. Update sample/source files only.
+2. Keep real data outside tracked paths.
+3. Run:
+
+   ```powershell
+   python tests/validate_privacy_guard.py
+   ```
+
+4. Run:
+
+   ```powershell
+   git status --short
+   ```
+
+5. Review staged files manually.
+6. Commit only source, docs, tests, automation, and sample-safe files.
+7. Do not commit ignored/private files or final external documents.
