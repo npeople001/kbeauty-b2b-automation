@@ -224,4 +224,39 @@ This roadmap defines planned automation tasks for the K-beauty B2B export busine
 - External data and sending restriction: Task 011 does not include a real data workflow, `data/private/` usage, dashboard, scraping, live web research, automatic search, APIs, browser automation, crawlers, buyer enrichment, credit checks, email sending, messaging automation, quotation sending, external sending, or external data collection.
 - Validation method: Run `python tests/validate_privacy_guard.py`; run `python tests/validate_integrated_runner.py`; run `python automations/run_internal_workflow.py --workflow buyer_sales_sample --dry-run`; run `python automations/run_internal_workflow.py --workflow buyer_sales_sample --output-summary output/internal_workflow_summary.md`; run `python tests/validate_integrated_runner.py --check-summary --summary output/internal_workflow_summary.md`; run `python -m py_compile automations/run_internal_workflow.py tests/validate_integrated_runner.py`.
 - Risks: Runner executes multiple scripts, so failure cause must be read from the summary. Generated sample output files may change during full run. XLSX output can be affected by file locks. Summary `PASS` does not mean external-ready proposal or quotation. Real/private workflow is not supported yet. Human review is still required before external use. Future dashboard or real-data runner requires separate design.
-- Future work: Task 012 remains future discussion only. Do not define or start Task 012 until Task 011 final review passes.
+- Follow-up: Task 012 was later defined as Operations Dashboard to summarize the local sample/internal-review workflow after Task 011 Integrated Runner was in place.
+
+## Task 012: Operations Dashboard
+
+- Status: Completed pending final review.
+- Goal: Summarize the local sample/internal-review buyer sales workflow status in a Markdown-only internal operations dashboard.
+- Input: Existing Task 006-011 local sample/internal-review outputs, including `output/internal_workflow_summary.md`, `data/buyers_master_sample.csv`, `data/buyers_scored_sample.csv`, `data/proposal_messages_sample.csv`, `data/quotation_sample.csv`, and `data/brands_master.csv`.
+- Completed outputs:
+  - `docs/operations_dashboard_spec.md`
+  - `docs/operations_dashboard_schema.md`
+  - `automations/operations_dashboard/README.md`
+  - `automations/operations_dashboard/generate_operations_dashboard.py`
+  - `tests/validate_operations_dashboard.py`
+  - `output/operations_dashboard.md`
+  - `README.md`
+- Primary output: `output/operations_dashboard.md`.
+- Deferred outputs:
+  - `output/operations_dashboard.xlsx`
+  - `data/operations_dashboard_summary.csv`
+- Output decision: Task 012 v1 is Markdown-only. XLSX dashboard output and CSV dashboard summary output are deferred until separately approved and validated.
+- Dashboard summaries:
+  - Integrated Runner status
+  - buyer pipeline
+  - buyer priority
+  - approval and brand risk
+  - proposal message status
+  - quotation status
+  - MOQ / price / stock / expiry issues
+  - next actions
+  - internal review items
+  - risks and warnings
+- Business rules: Dashboard is internal-review only and uses local sample/internal-review data only. It does not use `data/private`, `output/private`, or `output/final` paths. It must not display `contact_email`, `contact_phone`, `wechat_id`, `whatsapp`, `phone`, `email`, `private_note`, `real_contact`, `real_price`, `real_stock`, or `real_expiry`. `score_total` is only an internal prioritization signal. `approval_block` overrides `priority_tier` and `score_total`. `硫붾뵒?먮툕`/Medicube remains approval-required before external proposal. Proposal messages and quotations remain internal drafts. `PASS` does not mean final commercial approval.
+- External data and sending restriction: Task 012 does not include a real data workflow, `data/private` usage, `output/private` usage, `output/final` usage, XLSX dashboard v1, CSV dashboard summary v1, scraping, live web research, automatic search, APIs, browser automation, crawlers, buyer enrichment, credit checks, email sending, messaging automation, quotation sending, external sending, or external data collection.
+- Validation method: Run `python tests/validate_privacy_guard.py`; run `python tests/validate_operations_dashboard.py --skip-dashboard`; run `python automations/operations_dashboard/generate_operations_dashboard.py --output output/operations_dashboard.md`; run `python tests/validate_operations_dashboard.py --dashboard output/operations_dashboard.md`; run `python -m py_compile automations/operations_dashboard/generate_operations_dashboard.py tests/validate_operations_dashboard.py`. Current dashboard validation passes with a non-blocking warning that the `brands` row count is not directly printed in the dashboard body; v1 passes because brand risk and approval warnings are summarized.
+- Risks: `output/operations_dashboard.md` is ignored generated output and may not be committed. Dashboard `PASS` can be misread as external-ready approval. Quotation `PASS` can be misread as final commercial approval. Approval-blocked and `硫붾뵒?먮툕` warning cases require manual review. Dashboard does not validate real buyer authenticity, creditworthiness, live price, stock, expiry, tax, shipping, duties, payment terms, or incoterms. Markdown-only v1 lacks spreadsheet filtering. Future XLSX/CSV outputs need separate privacy and validation design. Real/private workflow is not supported.
+- Future work: Task 013 remains future discussion only. Do not define or start Task 013 in Task 012.

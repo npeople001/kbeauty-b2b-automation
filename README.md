@@ -325,7 +325,160 @@ After running:
 - No external sending.
 - No commercial accuracy validation beyond existing validators.
 - No buyer authenticity or credit verification.
-- No dashboard.
+- Operations Dashboard is handled separately by Task 012.
+
+## Operations Dashboard
+
+The Operations Dashboard summarizes the local sample/internal-review buyer sales workflow. It reads existing Task 006-011 outputs and turns workflow status, buyer priority, approval blocks, proposal draft status, quotation draft status, commercial confirmation gaps, and next actions into one internal review Markdown document.
+
+The dashboard is internal-review only. It is not an external sending tool, buyer verification tool, credit check tool, market verification tool, or final quotation approval tool.
+
+### v1 Markdown-Only Policy
+
+Task 012 v1 uses Markdown only.
+
+- v1 output: `output/operations_dashboard.md`
+- v1 does not create `output/operations_dashboard.xlsx`.
+- v1 does not create `data/operations_dashboard_summary.csv`.
+- XLSX/CSV outputs are deferred until separately approved and validated.
+- Markdown-only v1 reduces file lock risk, validation complexity, privacy exposure risk, and accidental external-use risk.
+
+### Dashboard Inputs
+
+The dashboard uses local sample/internal-review files only:
+
+- `output/internal_workflow_summary.md`
+- `data/buyers_master_sample.csv`
+- `data/buyers_scored_sample.csv`
+- `data/proposal_messages_sample.csv`
+- `data/quotation_sample.csv`
+- `data/brands_master.csv`
+
+Do not use `data/private/`, `output/private/`, or `output/final/` paths for v1 dashboard generation.
+
+### Generate Dashboard
+
+Run a dry run first:
+
+```powershell
+python automations/operations_dashboard/generate_operations_dashboard.py --dry-run
+```
+
+Generate the Markdown dashboard:
+
+```powershell
+python automations/operations_dashboard/generate_operations_dashboard.py --output output/operations_dashboard.md
+```
+
+### Validate Dashboard
+
+Validate the generated dashboard:
+
+```powershell
+python tests/validate_operations_dashboard.py --dashboard output/operations_dashboard.md
+```
+
+Validate generator safety and source expectations without requiring a dashboard file:
+
+```powershell
+python tests/validate_operations_dashboard.py --skip-dashboard
+```
+
+Also run:
+
+```powershell
+python tests/validate_privacy_guard.py
+python -m py_compile automations/operations_dashboard/generate_operations_dashboard.py tests/validate_operations_dashboard.py
+```
+
+### Recommended Dashboard Workflow
+
+1. Run Privacy Guard.
+2. Run Integrated Runner if buyer/proposal/quotation sample outputs need refresh.
+3. Run the Operations Dashboard generator.
+4. Run the Operations Dashboard validator.
+5. Review `output/operations_dashboard.md` manually.
+6. Do not externally send dashboard outputs.
+7. Run Privacy Guard before commit.
+
+### Dashboard Sections
+
+The Markdown dashboard includes:
+
+1. Executive Summary
+2. Integrated Runner Status
+3. Buyer Pipeline Summary
+4. Buyer Priority Summary
+5. Approval & Brand Risk Summary
+6. Proposal Message Summary
+7. Quotation Summary
+8. MOQ / Price / Stock / Expiry Issues
+9. Next Action Summary
+10. Internal Review Required Items
+11. Key Risks and Warnings
+12. Final Operational Recommendation
+
+### Dashboard Privacy Restrictions
+
+The dashboard must not expose:
+
+- `contact_email`
+- `contact_phone`
+- `wechat_id`
+- `whatsapp`
+- `phone`
+- `email`
+- `private_note`
+- `real_contact`
+- `real_price`
+- `real_stock`
+- `real_expiry`
+
+### Approval and Brand Restrictions
+
+- `approval_block=true` must be reviewed first.
+- `硫붾뵒?먮툕`/Medicube remains approval-required.
+- `approval_required=true` means review-required.
+- `proposal_allowed=false` means blocked/not allowed for external proposal.
+- `priority_tier=A` or high `score_total` must not override `approval_block`.
+- `score_total` is only an internal prioritization signal, not buyer authenticity, creditworthiness, or purchase probability.
+
+### Proposal and Quotation Restrictions
+
+- Proposal messages are internal drafts.
+- Quotations are internal drafts.
+- `PASS` does not mean final commercial approval.
+- Price, stock, expiry, MOQ, delivery, tax, shipping, duties, payment terms, and incoterms require manual review before external use.
+- Dashboard output must not be used as send-ready or final quotation material.
+
+### Dashboard Output Policy
+
+`output/operations_dashboard.md` is generated output. It may be ignored by `.gitignore` under `output/*`.
+
+Do not force-add ignored output files unless explicitly approved. The generated dashboard can be regenerated from the committed generator and sample inputs.
+
+### Known Dashboard Warning
+
+The dashboard validator may produce a non-blocking warning if the `brands` row count is not directly printed in the dashboard body. This does not block v1 if brand risk and approval warnings are still summarized.
+
+Do not modify generator output solely to remove this warning unless later approved.
+
+### Dashboard External Automation Restrictions
+
+The Operations Dashboard does not implement:
+
+- Scraping.
+- Live web research.
+- Automatic search.
+- APIs.
+- Browser automation.
+- Crawlers.
+- Buyer enrichment.
+- Credit checks.
+- Email sending.
+- Messaging automation.
+- Quotation sending.
+- External sending.
 
 ### Commit Safety Workflow
 
