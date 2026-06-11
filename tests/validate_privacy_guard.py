@@ -23,6 +23,21 @@ TEXT_SUFFIXES = {".md", ".csv", ".txt", ".py", ".json", ".yaml", ".yml", ".gitig
 SKIP_DIRS = {".git", ".venv", "venv", "__pycache__"}
 SKIP_SUFFIXES = {".xlsx", ".xls", ".pdf", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".html"}
 
+RESTRICTED_PATH_PREFIXES = [
+    "data/private/",
+    "data/private/templates/",
+    "output/private/",
+    "output/final/",
+    "local_config/",
+]
+
+RESTRICTED_LOCAL_FOLDERS = [
+    "data/private",
+    "data/private/templates",
+    "output/private",
+    "output/final",
+]
+
 SENSITIVE_PATH_PATTERNS = [
     "data/private/**",
     "output/private/**",
@@ -188,8 +203,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--root", default=".", help="Repository root path")
     parser.add_argument(
         "--mode",
-        default="working-tree",
-        choices=["working-tree", "staged-only"],
+        default="all",
+        choices=["all", "working-tree", "staged-only"],
         help="Validation mode",
     )
     parser.add_argument(
@@ -205,7 +220,14 @@ def normalize_rel(path: Path, root: Path) -> str:
         rel = path.resolve().relative_to(root.resolve())
     except ValueError:
         rel = path
-    return str(rel).replace("\\", "/")
+    return normalize_git_path(str(rel))
+
+
+def normalize_git_path(path: str) -> str:
+    normalized = path.strip().replace("\\", "/")
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+    return normalized
 
 
 def run_git(root: Path, args: list[str]) -> tuple[int, str, str]:
@@ -244,7 +266,15 @@ def staged_files(root: Path, result: Result) -> list[str]:
     if code != 0:
         result.fail(f"git staged file inspection failed: {stderr.strip() or stdout.strip()}")
         return []
-    return [line.strip().replace("\\", "/") for line in stdout.splitlines() if line.strip()]
+    return [normalize_git_path(line) for line in stdout.splitlines() if line.strip()]
+
+
+def tracked_files(root: Path, result: Result) -> list[str]:
+    code, stdout, stderr = run_git(root, ["ls-files"])
+    if code != 0:
+        result.fail(f"git tracked file inspection failed: {stderr.strip() or stdout.strip()}")
+        return []
+    return [normalize_git_path(line) for line in stdout.splitlines() if line.strip()]
 
 
 def working_tree_files(root: Path, result: Result) -> list[str]:
@@ -253,8 +283,8 @@ def working_tree_files(root: Path, result: Result) -> list[str]:
         code2, untracked, err2 = run_git(root, ["ls-files", "--others", "--exclude-standard"])
         if code1 == 0 and code2 == 0:
             files = set()
-            files.update(line.strip().replace("\\", "/") for line in tracked.splitlines() if line.strip())
-            files.update(line.strip().replace("\\", "/") for line in untracked.splitlines() if line.strip())
+            files.update(normalize_git_path(line) for line in tracked.splitlines() if line.strip())
+            files.update(normalize_git_path(line) for line in untracked.splitlines() if line.strip())
             return sorted(files)
         result.warn(f"git file listing failed; falling back to directory walk: {err1.strip()} {err2.strip()}".strip())
 
@@ -291,6 +321,35 @@ def should_skip(rel_path: str) -> bool:
 def is_sensitive_path(rel_path: str) -> bool:
     name = Path(rel_path).name
     return any(fnmatch.fnmatch(rel_path, pattern) or fnmatch.fnmatch(name, pattern) for pattern in SENSITIVE_PATH_PATTERNS)
+
+
+def is_restricted_path(rel_path: str) -> bool:
+    normalized = normalize_git_path(rel_path)
+    return any(normalized == prefix.rstrip("/") or normalized.startswith(prefix) for prefix in RESTRICTED_PATH_PREFIXES)
+
+
+def check_restricted_paths(root: Path, result: Result, mode: str, staged_set: set[str]) -> None:
+    for rel_path in sorted(staged_set):
+        if is_restricted_path(rel_path):
+            result.fail(f"{rel_path}: restricted private/final path is staged")
+
+    if mode != "staged-only":
+        for rel_path in tracked_files(root, result):
+            if is_restricted_path(rel_path):
+                result.fail(f"{rel_path}: restricted private/final path is tracked")
+
+        for folder in RESTRICTED_LOCAL_FOLDERS:
+            folder_path = root / folder
+            if not folder_path.exists():
+                continue
+            normalized = normalize_git_path(folder)
+            tracked_under_folder = any(path == normalized or path.startswith(f"{normalized}/") for path in tracked_files(root, result))
+            staged_under_folder = any(path == normalized or path.startswith(f"{normalized}/") for path in staged_set)
+            ignored = git_check_ignore(root, f"{normalized}/example.placeholder") if git_available(root) else False
+            if not tracked_under_folder and not staged_under_folder and ignored:
+                result.warn(f"{normalized}: restricted folder exists locally but is ignored and untracked")
+            elif not tracked_under_folder and not staged_under_folder:
+                result.fail(f"{normalized}: restricted folder exists locally but is not confirmed ignored")
 
 
 def read_text(path: Path, result: Result, rel_path: str) -> str | None:
@@ -462,6 +521,8 @@ def scan_file(root: Path, rel_path: str, result: Result) -> None:
 def main() -> int:
     args = parse_args()
     mode = "staged-only" if args.staged_only else args.mode
+    if mode == "working-tree":
+        mode = "all"
     root = Path(args.root).resolve()
     result = Result()
 
@@ -482,6 +543,8 @@ def main() -> int:
     rel_paths = staged_files(root, result) if mode == "staged-only" and has_git else working_tree_files(root, result)
 
     check_gitignore(root, result)
+    if has_git:
+        check_restricted_paths(root, result, mode, staged)
     check_sensitive_filenames(root, rel_paths, result, staged)
 
     for rel_path in rel_paths:
