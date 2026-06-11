@@ -44,16 +44,32 @@ SENSITIVE_PATH_PATTERNS = [
     "output/final/**",
     "local_config/**",
     "*_real.csv",
+    "*_real.xlsx",
     "*_private.csv",
+    "*_private.xlsx",
     "*_production.csv",
     "*_contacts.csv",
+    "*_contacts.xlsx",
+    "*_contact*.csv",
+    "*_contact*.xlsx",
     "*_buyers_real.csv",
     "*_prices.csv",
+    "*_prices.xlsx",
+    "*_price*.csv",
+    "*_price*.xlsx",
     "*_price_list.csv",
     "*_stock.csv",
+    "*_stock.xlsx",
+    "*_stock*.csv",
+    "*_stock*.xlsx",
     "*_inventory.csv",
     "*_expiry.csv",
+    "*_expiry.xlsx",
+    "*_expiry*.csv",
+    "*_expiry*.xlsx",
     "*_quotation_final.*",
+    "*_approved_quotation.*",
+    "*_commercially_approved.*",
     "*_supplier_terms.*",
     "*_contract_terms.*",
     "*_payment_terms.*",
@@ -61,6 +77,18 @@ SENSITIVE_PATH_PATTERNS = [
     "*_final_quotation.*",
     "*_external_ready.*",
     "*_send_ready.*",
+    "*real_data*",
+    "*private_data*",
+    "*buyer_contacts*",
+    "*wechat*",
+    "*whatsapp*",
+    "*supplier_terms*",
+    "*distributor_terms*",
+    "*internal_margin*",
+    "*final_quote*",
+    "*final_quotation*",
+    "*external_ready*",
+    "*send_ready*",
     ".env",
     "*.key",
     "*_token*",
@@ -319,8 +347,19 @@ def should_skip(rel_path: str) -> bool:
 
 
 def is_sensitive_path(rel_path: str) -> bool:
-    name = Path(rel_path).name
-    return any(fnmatch.fnmatch(rel_path, pattern) or fnmatch.fnmatch(name, pattern) for pattern in SENSITIVE_PATH_PATTERNS)
+    normalized = normalize_git_path(rel_path).lower()
+    name = Path(normalized).name
+    return any(
+        fnmatch.fnmatch(normalized, pattern.lower()) or fnmatch.fnmatch(name, pattern.lower())
+        for pattern in SENSITIVE_PATH_PATTERNS
+    )
+
+
+def exempt_from_sensitive_filename_check(rel_path: str) -> bool:
+    normalized = normalize_git_path(rel_path).lower()
+    if normalized in {"readme.md", "agents.md", "tests/validate_privacy_guard.py"}:
+        return True
+    return normalized.startswith("docs/") and normalized.endswith(".md")
 
 
 def is_restricted_path(rel_path: str) -> bool:
@@ -363,17 +402,22 @@ def read_text(path: Path, result: Result, rel_path: str) -> str | None:
         return None
 
 
-def check_sensitive_filenames(root: Path, rel_paths: list[str], result: Result, staged_set: set[str]) -> None:
-    for rel_path in rel_paths:
+def check_sensitive_filenames(root: Path, result: Result, mode: str, staged_set: set[str]) -> None:
+    paths_to_check = set(staged_set)
+    if mode != "staged-only":
+        paths_to_check.update(tracked_files(root, result))
+
+    for rel_path in sorted(paths_to_check):
+        if exempt_from_sensitive_filename_check(rel_path):
+            continue
         if not is_sensitive_path(rel_path):
             continue
-        ignored = git_check_ignore(root, rel_path) if git_available(root) else False
         tracked = git_tracked(root, rel_path) if git_available(root) else False
         staged = rel_path in staged_set
-        if staged or (not ignored and not tracked):
-            result.fail(f"{rel_path}: high-risk filename/path is not safely ignored")
-        elif ignored:
-            result.warn(f"{rel_path}: high-risk filename/path is protected by .gitignore")
+        if staged:
+            result.fail(f"{rel_path}: sensitive real/private/commercial filename is staged")
+        elif tracked:
+            result.fail(f"{rel_path}: sensitive real/private/commercial filename is tracked")
 
 
 def check_gitignore(root: Path, result: Result) -> None:
@@ -545,7 +589,7 @@ def main() -> int:
     check_gitignore(root, result)
     if has_git:
         check_restricted_paths(root, result, mode, staged)
-    check_sensitive_filenames(root, rel_paths, result, staged)
+        check_sensitive_filenames(root, result, mode, staged)
 
     for rel_path in rel_paths:
         scan_file(root, rel_path, result)
