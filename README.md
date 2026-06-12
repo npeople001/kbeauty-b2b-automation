@@ -102,18 +102,29 @@ Optional modes:
 ```powershell
 python tests/validate_privacy_guard.py --root .
 python tests/validate_privacy_guard.py --mode working-tree
-python tests/validate_privacy_guard.py --staged-only
+python tests/validate_privacy_guard.py --mode staged-only
+python tests/validate_privacy_guard.py --self-test
+python -m py_compile tests/validate_privacy_guard.py
 ```
 
-The validation checks:
+The enhanced Privacy Guard checks:
 
 - Sensitive file names and paths.
+- Restricted private/final paths.
+- Staged or tracked private/final paths.
+- Sensitive real/private/commercial/final/external-ready filenames.
+- Strict data/output content markers.
+- False-positive-safe documentation, validator code, and sample placeholders.
+- PASS/WARNING/FAIL output with source labels.
+- Synthetic self-test coverage.
 - Real/private/contact/price/stock/expiry/final quotation patterns.
 - Sample contact placeholder safety.
 - `메디큐브` approval-required context.
 - Forbidden external collection or sending implementation.
 - Required `.gitignore` protections.
 - Sample files remain trackable.
+
+Privacy Guard is a safety gate, not a complete DLP system. `PASS` does not mean external approval, final quotation approval, buyer authenticity verification, creditworthiness verification, or purchase probability verification. Real/private workflow, final quotation workflow, and external sending remain disabled and prohibited unless a separate approved task defines them.
 
 ### Safe Sample Data Rules
 
